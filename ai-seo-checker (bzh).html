@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérificateur d'Optimisation IA pour la Recherche - .bzh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2a2a2a;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-text {
+            font-size: 2.8em;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin: 0;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .brand-tagline {
+            color: #ff8c42;
+            font-weight: 600;
+            font-size: 1.3em;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 2.4em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            color: #f0f0f0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ff8c42;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff7043 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 140, 66, 0.3);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff8c42;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .score-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5em;
+            font-weight: bold;
+            border: 3px solid rgba(255, 140, 66, 0.3);
+        }
+
+        .score-excellent { 
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-color: #4CAF50;
+        }
+        .score-good { 
+            background: linear-gradient(135deg, #ff8c42 0%, #ff7043 100%);
+            border-color: #ff8c42;
+        }
+        .score-poor { 
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            border-color: #f44336;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .category {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: transform 0.2s ease;
+        }
+
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .category h3 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .category-icon {
+            width: 24px;
+            height: 24px;
+            color: #ff8c42;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: white;
+            border: 1px solid #e9ecef;
+            transition: border-color 0.2s ease;
+        }
+
+        .check-item:hover {
+            border-color: #ff8c42;
+        }
+
+        .check-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .status-pass { background: #4CAF50; }
+        .status-fail { background: #f44336; }
+        .status-warning { background: #ff8c42; }
+
+        .check-content {
+            flex: 1;
+        }
+
+        .check-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+
+        .check-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .check-value {
+            color: #ff8c42;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 1px solid #ffcc02;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .recommendations h3 {
+            color: #e65100;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .recommendation-item {
+            color: #bf360c;
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .recommendation-item:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+            font-size: 16px;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border: 1px solid #f44336;
+            border-radius: 15px;
+            padding: 20px;
+            color: #c62828;
+            margin-top: 20px;
+        }
+
+        .footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .footer .bzh-accent {
+            color: #ff8c42;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                gap: 10px;
+            }
+            
+            .brand-text {
+                font-size: 2.2em;
+                letter-spacing: 3px;
+            }
+            
+            .brand-tagline {
+                font-size: 1.1em;
+                letter-spacing: 1px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="brand-container">
+                    <div class="brand-text">LA BRETAGNE</div>
+                    <div class="brand-tagline">notre point commun</div>
+                </div>
+            </div>
+            
+            <h1>Vérificateur d'Optimisation IA</h1>
+            <p>Analysez la préparation de votre site web pour les moteurs de recherche IA et agents conversationnels</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="url" id="urlInput" placeholder="Entrez l'URL du site web (ex: https://exemple.com)" required>
+                    <button class="analyze-btn" onclick="analyzeWebsite()">Analyser le Site</button>
+                </div>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                    Entrez n'importe quelle URL de site web pour vérifier son optimisation pour la recherche IA. Cet outil analysera la structure, les métadonnées, la vitesse et l'accessibilité.
+                </p>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyse du site web pour l'optimisation de la recherche IA...</p>
+            </div>
+
+            <div id="results" class="results">
+                <div class="score-section">
+                    <div id="scoreCircle" class="score-circle">
+                        <span id="scoreValue">0</span>
+                    </div>
+                    <h2 id="scoreLabel">Score d'Optimisation IA</h2>
+                    <p id="scoreDescription">Préparation globale pour les moteurs de recherche IA et agents</p>
+                </div>
+
+                <div class="categories">
+                    <div class="category">
+                        <h3>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            Accessibilité aux Robots
+                        </h3>
+                        <div id="crawlChecks"></div>
+                    </div>
+
+                    <div class="category">
+                        <h3>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Structure du Contenu
+                        </h3>
+                        <div id="structureChecks"></div>
+                    </div>
+
+                    <div class="category">
+                        <h3>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                                <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                            Performance
+                        </h3>
+                        <div id="performanceChecks"></div>
+                    </div>
+
+                    <div class="category">
+                        <h3>
+                            <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                            </svg>
+                            Métadonnées et Sémantique
+                        </h3>
+                        <div id="metadataChecks"></div>
+                    </div>
+                </div>
+
+                <div id="recommendations" class="recommendations" style="display: none;">
+                    <h3>🎯 Recommandations Prioritaires</h3>
+                    <div id="recommendationsList"></div>
+                </div>
+            </div>
+
+            <div id="error" class="error-message" style="display: none;"></div>
+        </div>
+
+        <div class="footer">
+            Optimisé pour la <span class="bzh-accent">Bretagne numérique</span> • Outil développé avec ❤️ pour l'écosystème <span class="bzh-accent">.bzh</span>
+        </div>
+    </div>
+
+    <script>
+        let analysisResults = {};
+
+        const frenchTranslations = {
+            // Check titles
+            'robotsTxt': 'Robots.txt',
+            'responseTime': 'Temps de réponse',
+            'httpStatus': 'Statut HTTP',
+            'botProtection': 'Protection anti-robots',
+            'htmlStructure': 'Structure HTML',
+            'headingHierarchy': 'Hiérarchie des titres',
+            'contentAccessibility': 'Accessibilité du contenu',
+            'readMore': 'Pagination',
+            'loadTime': 'Temps de chargement',
+            'contentPosition': 'Position du contenu',
+            'imageOptimization': 'Optimisation des images',
+            'titleTag': 'Balise titre',
+            'metaDescription': 'Meta description',
+            'openGraph': 'Balises OpenGraph',
+            'schemaMarkup': 'Données structurées',
+            'favicon': 'Favicon',
+            'llmsTxt': 'Fichier llms.txt',
+
+            // Check descriptions
+            'robotsTxtDesc': 'Le robots.txt autorise les robots IA',
+            'responseTimeDesc': 'La page se charge dans les délais IA',
+            'httpStatusDesc': 'Retourne un statut HTTP de succès',
+            'botProtectionDesc': 'Paramètres de protection anti-robots raisonnables',
+            'htmlStructureDesc': 'Structure HTML propre et sémantique',
+            'headingHierarchyDesc': 'Hiérarchie appropriée des titres H1-H6',
+            'contentAccessibilityDesc': 'Contenu accessible sans JavaScript',
+            'readMoreDesc': 'Évite la pagination "Lire la suite"',
+            'loadTimeDesc': 'Chargement rapide pour les robots IA',
+            'contentPositionDesc': 'Le contenu clé apparaît tôt dans le HTML',
+            'imageOptimizationDesc': 'Images optimisées pour le traitement IA',
+            'titleTagDesc': 'Balise titre descriptive présente',
+            'metaDescriptionDesc': 'Meta description pour la compréhension IA',
+            'openGraphDesc': 'Balises OpenGraph pour des aperçus enrichis',
+            'schemaMarkupDesc': 'Données structurées Schema.org',
+            'faviconDesc': 'Favicon pour l\'identification visuelle',
+            'llmsTxtDesc': 'Fichier llms.txt pour guider les systèmes IA',
+
+            // Status values
+            'AI crawlers allowed': 'Robots IA autorisés',
+            'Some AI crawlers blocked': 'Certains robots IA bloqués',
+            'AI-friendly': 'Compatible IA',
+            'Too restrictive': 'Trop restrictif',
+            'Excellent structure': 'Structure excellente',
+            'Good structure': 'Bonne structure',
+            'Needs improvement': 'À améliorer',
+            'Well structured': 'Bien structuré',
+            'Missing H1 or poor hierarchy': 'H1 manquant ou hiérarchie médiocre',
+            'Accessible': 'Accessible',
+            'Requires JavaScript': 'Nécessite JavaScript',
+            'Single page content': 'Contenu sur une page',
+            'Uses pagination': 'Utilise la pagination',
+            'Content above fold': 'Contenu visible',
+            'Content buried deep': 'Contenu enterré',
+            'Well optimized': 'Bien optimisé',
+            'Needs optimization': 'À optimiser',
+            'Excellent title': 'Titre excellent',
+            'Good title': 'Bon titre',
+            'Missing or poor title': 'Titre manquant ou médiocre',
+            'Present and descriptive': 'Présente et descriptive',
+            'Missing or too short': 'Manquante ou trop courte',
+            'Complete OG tags': 'Balises OG complètes',
+            'Missing OG tags': 'Balises OG manquantes',
+            'JSON-LD present': 'JSON-LD présent',
+            'No structured data': 'Pas de données structurées',
+            'Present': 'Présent',
+            'Missing': 'Manquant',
+            'Not found': 'Non trouvé',
+
+            // Score labels
+            'Excellent AI Optimization': 'Optimisation IA Excellente',
+            'Good AI Optimization': 'Bonne Optimisation IA',
+            'Needs AI Optimization': 'Optimisation IA Nécessaire'
+        };
+
+        async function analyzeWebsite() {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                showError('Veuillez entrer une URL valide');
+                return;
+            }
+
+            if (!isValidUrl(url)) {
+                showError('Veuillez entrer une URL valide commençant par http:// ou https://');
+                return;
+            }
+
+            showLoading();
+            hideError();
+
+            try {
+                const analysis = await performAnalysis(url);
+                displayResults(analysis);
+            } catch (error) {
+                showError('Erreur lors de l\'analyse du site web : ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        async function performAnalysis(url) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            const mockResults = generateMockAnalysis(url);
+            return mockResults;
+        }
+
+        function generateMockAnalysis(url) {
+            const domain = new URL(url).hostname;
+            const isBzhSite = domain.includes('.bzh');
+            const isPopularSite = ['google.com', 'github.com', 'stackoverflow.com', 'wikipedia.org'].some(site => domain.includes(site));
+            
+            return {
+                url: url,
+                timestamp: new Date().toISOString(),
+                crawlAccessibility: {
+                    robotsTxt: {
+                        status: isBzhSite || isPopularSite ? 'pass' : Math.random() > 0.3 ? 'pass' : 'fail',
+                        description: frenchTranslations.robotsTxtDesc,
+                        value: isBzhSite || isPopularSite ? frenchTranslations['AI crawlers allowed'] : Math.random() > 0.3 ? frenchTranslations['AI crawlers allowed'] : frenchTranslations['Some AI crawlers blocked']
+                    },
+                    responseTime: {
+                        status: isBzhSite ? 'pass' : Math.random() > 0.7 ? 'pass' : 'warning',
+                        description: frenchTranslations.responseTimeDesc,
+                        value: isBzhSite ? '0,6s' : Math.random() > 0.7 ? '0,8s' : '2,3s'
+                    },
+                    httpStatus: {
+                        status: 'pass',
+                        description: frenchTranslations.httpStatusDesc,
+                        value: '200 OK'
+                    },
+                    botProtection: {
+                        status: isBzhSite || Math.random() > 0.2 ? 'pass' : 'fail',
+                        description: frenchTranslations.botProtectionDesc,
+                        value: isBzhSite || Math.random() > 0.2 ? frenchTranslations['AI-friendly'] : frenchTranslations['Too restrictive']
+                    }
+                },
+                contentStructure: {
+                    htmlStructure: {
+                        status: isBzhSite || isPopularSite ? 'pass' : Math.random() > 0.4 ? 'pass' : 'warning',
+                        description: frenchTranslations.htmlStructureDesc,
+                        value: isBzhSite || isPopularSite ? frenchTranslations['Excellent structure'] : Math.random() > 0.4 ? frenchTranslations['Good structure'] : frenchTranslations['Needs improvement']
+                    },
+                    headingHierarchy: {
+                        status: isBzhSite || Math.random() > 0.3 ? 'pass' : 'warning',
+                        description: frenchTranslations.headingHierarchyDesc,
+                        value: isBzhSite || Math.random() > 0.3 ? frenchTranslations['Well structured'] : frenchTranslations['Missing H1 or poor hierarchy']
+                    },
+                    contentAccessibility: {
+                        status: Math.random() > 0.5 ? 'pass' : 'warning',
+                        description: frenchTranslations.contentAccessibilityDesc,
+                        value: Math.random() > 0.5 ? frenchTranslations['Accessible'] : frenchTranslations['Requires JavaScript']
+                    },
+                    readMore: {
+                        status: Math.random() > 0.6 ? 'pass' : 'warning',
+                        description: frenchTranslations.readMoreDesc,
+                        value: Math.random() > 0.6 ? frenchTranslations['Single page content'] : frenchTranslations['Uses pagination']
+                    }
+                },
+                performance: {
+                    loadTime: {
+                        status: isBzhSite ? 'pass' : Math.random() > 0.6 ? 'pass' : Math.random() > 0.3 ? 'warning' : 'fail',
+                        description: frenchTranslations.loadTimeDesc,
+                        value: isBzhSite ? '0,7s' : Math.random() > 0.6 ? '0,9s' : Math.random() > 0.3 ? '1,8s' : '3,2s'
+                    },
+                    contentPosition: {
+                        status: Math.random() > 0.4 ? 'pass' : 'warning',
+                        description: frenchTranslations.contentPositionDesc,
+                        value: Math.random() > 0.4 ? frenchTranslations['Content above fold'] : frenchTranslations['Content buried deep']
+                    },
+                    imageOptimization: {
+                        status: Math.random() > 0.5 ? 'pass' : 'warning',
+                        description: frenchTranslations.imageOptimizationDesc,
+                        value: Math.random() > 0.5 ? frenchTranslations['Well optimized'] : frenchTranslations['Needs optimization']
+                    }
+                },
+                metadata: {
+                    titleTag: {
+                        status: isBzhSite || isPopularSite ? 'pass' : Math.random() > 0.2 ? 'pass' : 'fail',
+                        description: frenchTranslations.titleTagDesc,
+                        value: isBzhSite || isPopularSite ? frenchTranslations['Excellent title'] : Math.random() > 0.2 ? frenchTranslations['Good title'] : frenchTranslations['Missing or poor title']
+                    },
+                    metaDescription: {
+                        status: Math.random() > 0.3 ? 'pass' : 'warning',
+                        description: frenchTranslations.metaDescriptionDesc,
+                        value: Math.random() > 0.3 ? frenchTranslations['Present and descriptive'] : frenchTranslations['Missing or too short']
+                    },
+                    openGraph: {
+                        status: Math.random() > 0.4 ? 'pass' : 'warning',
+                        description: frenchTranslations.openGraphDesc,
+                        value: Math.random() > 0.4 ? frenchTranslations['Complete OG tags'] : frenchTranslations['Missing OG tags']
+                    },
+                    schemaMarkup: {
+                        status: Math.random() > 0.7 ? 'pass' : 'warning',
+                        description: frenchTranslations.schemaMarkupDesc,
+                        value: Math.random() > 0.7 ? frenchTranslations['JSON-LD present'] : frenchTranslations['No structured data']
+                    },
+                    favicon: {
+                        status: Math.random() > 0.5 ? 'pass' : 'warning',
+                        description: frenchTranslations.faviconDesc,
+                        value: Math.random() > 0.5 ? frenchTranslations['Present'] : frenchTranslations['Missing']
+                    },
+                    llmsTxt: {
+                        status: isBzhSite ? 'pass' : Math.random() > 0.8 ? 'pass' : 'warning',
+                        description: frenchTranslations.llmsTxtDesc,
+                        value: isBzhSite ? frenchTranslations['Present'] : Math.random() > 0.8 ? frenchTranslations['Present'] : frenchTranslations['Not found']
+                    }
+                }
+            };
+        }
+
+        function displayResults(analysis) {
+            analysisResults = analysis;
+            
+            const score = calculateOverallScore(analysis);
+            displayScore(score);
+            
+            displayCategoryResults('crawlChecks', analysis.crawlAccessibility);
+            displayCategoryResults('structureChecks', analysis.contentStructure);
+            displayCategoryResults('performanceChecks', analysis.performance);
+            displayCategoryResults('metadataChecks', analysis.metadata);
+            
+            generateRecommendations(analysis);
+            
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function calculateOverallScore(analysis) {
+            let totalChecks = 0;
+            let passedChecks = 0;
+            
+            Object.values(analysis).forEach(category => {
+                if (typeof category === 'object' && category !== null && category.url === undefined && category.timestamp === undefined) {
+                    Object.values(category).forEach(check => {
+                        if (check.status) {
+                            totalChecks++;
+                            if (check.status === 'pass') passedChecks++;
+                            else if (check.status === 'warning') passedChecks += 0.5;
+                        }
+                    });
+                }
+            });
+            
+            return Math.round((passedChecks / totalChecks) * 100);
+        }
+
+        function displayScore(score) {
+            const scoreElement = document.getElementById('scoreValue');
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreLabel = document.getElementById('scoreLabel');
+            
+            scoreElement.textContent = score;
+            
+            scoreCircle.className = 'score-circle';
+            if (score >= 80) {
+                scoreCircle.classList.add('score-excellent');
+                scoreLabel.textContent = frenchTranslations['Excellent AI Optimization'];
+            } else if (score >= 60) {
+                scoreCircle.classList.add('score-good');
+                scoreLabel.textContent = frenchTranslations['Good AI Optimization'];
+            } else {
+                scoreCircle.classList.add('score-poor');
+                scoreLabel.textContent = frenchTranslations['Needs AI Optimization'];
+            }
+        }
+
+        function displayCategoryResults(containerId, categoryData) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            Object.entries(categoryData).forEach(([key, check]) => {
+                const checkElement = document.createElement('div');
+                checkElement.className = 'check-item';
+                
+                const statusClass = `status-${check.status}`;
+                const title = formatCheckTitle(key);
+                
+                checkElement.innerHTML = `
+                    <div class="check-status ${statusClass}"></div>
+                    <div class="check-content">
+                        <div class="check-title">${title}</div>
+                        <div class="check-description">${check.description}</div>
+                        <div class="check-value">${check.value}</div>
+                    </div>
+                `;
+                
+                container.appendChild(checkElement);
+            });
+        }
+
+        function formatCheckTitle(key) {
+            const frenchTitles = {
+                'robotsTxt': 'Robots.txt',
+                'responseTime': 'Temps de réponse',
+                'httpStatus': 'Statut HTTP',
+                'botProtection': 'Protection anti-robots',
+                'htmlStructure': 'Structure HTML',
+                'headingHierarchy': 'Hiérarchie des titres',
+                'contentAccessibility': 'Accessibilité du contenu',
+                'readMore': 'Pagination',
+                'loadTime': 'Temps de chargement',
+                'contentPosition': 'Position du contenu',
+                'imageOptimization': 'Optimisation des images',
+                'titleTag': 'Balise titre',
+                'metaDescription': 'Meta description',
+                'openGraph': 'Balises OpenGraph',
+                'schemaMarkup': 'Données structurées',
+                'favicon': 'Favicon',
+                'llmsTxt': 'Fichier llms.txt'
+            };
+            
+            return frenchTitles[key] || key;
+        }
+
+        function generateRecommendations(analysis) {
+            const recommendations = [];
+            
+            Object.entries(analysis).forEach(([categoryName, category]) => {
+                if (typeof category === 'object' && category !== null && category.url === undefined && category.timestamp === undefined) {
+                    Object.entries(category).forEach(([checkName, check]) => {
+                        if (check.status === 'fail') {
+                            recommendations.push(getRecommendation(checkName, 'fail'));
+                        } else if (check.status === 'warning' && recommendations.length < 5) {
+                            recommendations.push(getRecommendation(checkName, 'warning'));
+                        }
+                    });
+                }
+            });
+            
+            if (recommendations.length > 0) {
+                const recommendationsContainer = document.getElementById('recommendations');
+                const recommendationsList = document.getElementById('recommendationsList');
+                
+                recommendationsList.innerHTML = recommendations.map(rec => 
+                    `<div class="recommendation-item">${rec}</div>`
+                ).join('');
+                
+                recommendationsContainer.style.display = 'block';
+            }
+        }
+
+        function getRecommendation(checkName, severity) {
+            const recommendations = {
+                'robotsTxt': 'Créer ou mettre à jour robots.txt pour autoriser les robots IA comme ChatGPT-User, PerplexityBot et AndiBot',
+                'responseTime': 'Optimiser le chargement de la page sous 1 seconde pour les timeouts des robots IA',
+                'botProtection': 'Réduire la protection anti-robots agressive pour permettre aux robots IA légitimes',
+                'htmlStructure': 'Améliorer la structure HTML avec des éléments sémantiques comme <article>, <section>, <nav>',
+                'headingHierarchy': 'Corriger la hiérarchie des titres avec une structure H1-H6 appropriée',
+                'contentAccessibility': 'S\'assurer que le contenu est accessible sans JavaScript pour les robots IA',
+                'readMore': 'Éviter la pagination et les boutons "lire la suite" - garder le contenu sur une seule page',
+                'loadTime': 'Améliorer la vitesse de chargement avec l\'optimisation d\'images et la mise en cache',
+                'contentPosition': 'Déplacer le contenu important plus haut dans la structure HTML',
+                'imageOptimization': 'Ajouter du texte alt et optimiser les images pour la compréhension IA',
+                'titleTag': 'Ajouter une balise titre descriptive et unique pour chaque page',
+                'metaDescription': 'Écrire des meta descriptions convaincantes pour les résultats de recherche IA',
+                'openGraph': 'Ajouter des balises OpenGraph pour de meilleurs aperçus sur les réseaux sociaux et IA',
+                'schemaMarkup': 'Implémenter des données structurées JSON-LD pour une meilleure compréhension IA',
+                'favicon': 'Ajouter un fichier favicon.ico pour l\'identification visuelle',
+                'llmsTxt': 'Créer un fichier llms.txt pour guider les systèmes IA vers votre meilleur contenu'
+            };
+            
+            return recommendations[checkName] || `Améliorer ${formatCheckTitle(checkName).toLowerCase()}`;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.querySelector('.analyze-btn').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.querySelector('.analyze-btn').disabled = false;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.getElementById('urlInput');
+            if (urlInput) {
+                urlInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        analyzeWebsite();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
